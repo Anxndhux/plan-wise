@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import '../services/weather_service.dart';
 import 'login_screen.dart';
+import 'forecast_screen.dart';
+import 'calendar_screen.dart';
+import 'settings_screen.dart';
+import 'tips_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String userName;
@@ -235,13 +239,33 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Quick Access Button helper
   Widget quickAccessButton(BuildContext context, IconData icon, String label) {
+    Widget? screen;
+
+    switch (label) {
+      case 'Forecast':
+        screen = ForecastScreen();
+        break;
+      case 'Calendar':
+        screen = CalendarScreen();
+        break;
+      case 'Settings':
+        screen = SettingsScreen();
+        break;
+      case 'Tips':
+        screen = TipsScreen();
+        break;
+    }
+
     return Column(
       children: [
         InkWell(
           onTap: () {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text('$label clicked')));
+            if (screen != null) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => screen!),
+              );
+            }
           },
           child: CircleAvatar(
             radius: 30,
