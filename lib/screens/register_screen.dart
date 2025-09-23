@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -7,7 +8,6 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  final _formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -29,62 +29,122 @@ class _RegisterScreenState extends State<RegisterScreen> {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
+
+    if (message.contains("successful")) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => LoginScreen()),
+      );
+    }
+  }
+
+  Widget _buildTextField(
+    TextEditingController controller,
+    String hint,
+    IconData icon, {
+    bool obscureText = false,
+  }) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      decoration: InputDecoration(
+        prefixIcon: Icon(icon),
+        hintText: hint,
+        filled: true,
+        fillColor: Colors.grey[100],
+        contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Register')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextFormField(
-                  controller: nameController,
-                  decoration: InputDecoration(labelText: 'Name'),
+      backgroundColor: Colors.white,
+      body: Center(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.wb_sunny, size: 80, color: Colors.orangeAccent),
+              SizedBox(height: 16),
+              Text(
+                'PlanWise Registration',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
                 ),
-                SizedBox(height: 10),
-                TextFormField(
-                  controller: emailController,
-                  decoration: InputDecoration(labelText: 'Email'),
-                ),
-                SizedBox(height: 10),
-                TextFormField(
-                  controller: passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(labelText: 'Password'),
-                ),
-                SizedBox(height: 10),
-                TextFormField(
-                  controller: genderController,
-                  decoration: InputDecoration(labelText: 'Gender'),
-                ),
-                SizedBox(height: 10),
-                TextFormField(
-                  controller: dobController,
-                  decoration: InputDecoration(labelText: 'DOB (YYYY-MM-DD)'),
-                ),
-                SizedBox(height: 10),
-                TextFormField(
-                  controller: phoneController,
-                  decoration: InputDecoration(labelText: 'Phone'),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
+              ),
+              SizedBox(height: 32),
+
+              _buildTextField(nameController, 'Name', Icons.person),
+              SizedBox(height: 16),
+              _buildTextField(emailController, 'Email', Icons.email_outlined),
+              SizedBox(height: 16),
+              _buildTextField(
+                passwordController,
+                'Password',
+                Icons.lock_outline,
+                obscureText: true,
+              ),
+              SizedBox(height: 16),
+              _buildTextField(genderController, 'Gender', Icons.wc),
+              SizedBox(height: 16),
+              _buildTextField(
+                dobController,
+                'DOB (YYYY-MM-DD)',
+                Icons.calendar_today,
+              ),
+              SizedBox(height: 16),
+              _buildTextField(phoneController, 'Phone', Icons.phone),
+              SizedBox(height: 32),
+
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
                   onPressed: registerUser,
-                  child: Text('Register'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text('Register', style: TextStyle(fontSize: 18)),
                 ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/login');
-                  },
-                  child: Text("Already have an account? Login"),
-                ),
-              ],
-            ),
+              ),
+              SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Already have an account?",
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => LoginScreen()),
+                      );
+                    },
+                    child: Text(
+                      'Login',
+                      style: TextStyle(
+                        color: Colors.blueAccent,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
