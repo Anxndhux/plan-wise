@@ -5,6 +5,9 @@ import 'forecast_screen.dart';
 import 'settings_screen.dart';
 import 'tips_screen.dart';
 import 'login_screen.dart';
+import 'wardrobe_screen.dart';
+import 'vehicle_screen.dart';
+import 'profession_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String userName;
@@ -17,39 +20,20 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   TextEditingController cityController = TextEditingController();
   Map<String, dynamic> weatherData = {};
-  List<String> activities = [];
-  String outfitSuggestion = '';
-  String dailyTip = 'Stay hydrated!';
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    fetchWeather('Kollam');
+    fetchWeather('Kollam'); // default city
   }
 
   void fetchWeather(String city) async {
     setState(() => isLoading = true);
     final data = await WeatherService().getWeather(city);
-    double temp =
-        double.tryParse(data['temperature']?.replaceAll('°C', '') ?? '25') ??
-        25;
-
-    String outfit;
-    if (temp >= 28) {
-      outfit = 'Light T-shirt and shorts';
-      activities = ['Jogging', 'Outdoor Yoga', 'Cycling', 'Swimming'];
-    } else if (temp >= 20) {
-      outfit = 'T-shirt and jeans';
-      activities = ['Reading', 'Walking', 'Yoga', 'Cafe visit'];
-    } else {
-      outfit = 'Sweater and pants';
-      activities = ['Indoor exercises', 'Reading', 'Movie', 'Board Games'];
-    }
 
     setState(() {
       weatherData = data;
-      outfitSuggestion = outfit;
       isLoading = false;
     });
   }
@@ -58,38 +42,75 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
+      // ✅ Drawer for sidebar
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(color: Colors.blueAccent),
+              child: Text(
+                'Welcome, ${widget.userName}!',
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.checkroom),
+              title: Text('Wardrobe Manager'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => WardrobeScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.directions_car),
+              title: Text('Vehicle Preferences'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => VehicleScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.work),
+              title: Text('Profession Selection'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => ProfessionScreen()),
+                );
+              },
+            ),
+            Divider(),
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text('Logout'),
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => LoginScreen()),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+
       appBar: AppBar(
         title: Text('PlanWise'),
-        backgroundColor: Colors.blueAccent,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () => Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => LoginScreen()),
-            ),
-          ),
-        ],
+        backgroundColor: const Color.fromARGB(255, 111, 148, 228),
       ),
+
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: EdgeInsets.all(16),
               child: Column(
                 children: [
-                  // Greeting
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Hello, ${widget.userName}!',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-
                   // City input & search
                   Row(
                     children: [
@@ -122,98 +143,39 @@ class _HomeScreenState extends State<HomeScreen> {
                   SizedBox(height: 16),
 
                   // Weather Card
-                  _buildCard(
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.wb_sunny,
-                          size: 60,
-                          color: Colors.orangeAccent,
-                        ),
-                        SizedBox(width: 16),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${weatherData['condition'] ?? ''}, ${weatherData['temperature'] ?? ''}',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text('Weather today'),
-                          ],
-                        ),
-                      ],
+                  Card(
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  ),
-
-                  SizedBox(height: 16),
-
-                  // Outfit Card
-                  _buildCard(
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.checkroom,
-                          size: 50,
-                          color: Colors.blueAccent,
-                        ),
-                        SizedBox(width: 16),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Outfit Suggestion',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(outfitSuggestion),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  SizedBox(height: 16),
-
-                  // Activity Carousel
-                  SizedBox(
-                    height: 100,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: activities
-                          .map((act) => _activityCard(act))
-                          .toList(),
-                    ),
-                  ),
-
-                  SizedBox(height: 16),
-
-                  // Daily Tip Card
-                  _buildCard(
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.lightbulb,
-                          size: 40,
-                          color: Colors.yellow[700],
-                        ),
-                        SizedBox(width: 16),
-                        Expanded(
-                          child: Text(
-                            dailyTip,
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.wb_sunny,
+                            size: 60,
+                            color: Colors.orangeAccent,
                           ),
-                        ),
-                      ],
+                          SizedBox(width: 16),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${weatherData['condition'] ?? ''}, ${weatherData['temperature'] ?? ''}',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text('Weather today'),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-
                   SizedBox(height: 16),
 
                   // Quick Access Buttons
@@ -237,27 +199,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-    );
-  }
-
-  Widget _buildCard({required Widget child}) {
-    return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(padding: EdgeInsets.all(16), child: child),
-    );
-  }
-
-  Widget _activityCard(String title) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      margin: EdgeInsets.symmetric(horizontal: 8),
-      child: Container(
-        width: 120,
-        padding: EdgeInsets.all(12),
-        child: Center(child: Text(title, textAlign: TextAlign.center)),
-      ),
     );
   }
 
