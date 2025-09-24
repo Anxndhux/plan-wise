@@ -6,12 +6,12 @@ import 'settings_screen.dart';
 import 'tips_screen.dart';
 import 'login_screen.dart';
 import 'wardrobe_screen.dart';
-import 'vehicle_screen.dart';
-import 'profession_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String userName;
-  HomeScreen({required this.userName});
+  final String userEmail;
+
+  HomeScreen({required this.userName, required this.userEmail});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -31,7 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void fetchWeather(String city) async {
     setState(() => isLoading = true);
     final data = await WeatherService().getWeather(city);
-
     setState(() {
       weatherData = data;
       isLoading = false;
@@ -42,8 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
-      // ✅ Drawer for sidebar
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -61,27 +58,9 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => WardrobeScreen()),
-                );
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.directions_car),
-              title: Text('Vehicle Preferences'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => VehicleScreen()),
-                );
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.work),
-              title: Text('Profession Selection'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => ProfessionScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => WardrobeScreen(userEmail: widget.userEmail),
+                  ),
                 );
               },
             ),
@@ -99,19 +78,16 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-
       appBar: AppBar(
         title: Text('PlanWise'),
         backgroundColor: const Color.fromARGB(255, 111, 148, 228),
       ),
-
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: EdgeInsets.all(16),
               child: Column(
                 children: [
-                  // City input & search
                   Row(
                     children: [
                       Expanded(
@@ -141,8 +117,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                   SizedBox(height: 16),
-
-                  // Weather Card
                   Card(
                     elevation: 3,
                     shape: RoundedRectangleBorder(
@@ -177,8 +151,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   SizedBox(height: 16),
-
-                  // Quick Access Buttons
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
