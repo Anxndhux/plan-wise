@@ -83,7 +83,7 @@ class _AddOutfitScreenState extends State<AddOutfitScreen> {
                     SizedBox(height: 16),
                     DropdownButtonFormField<String>(
                       value: _category,
-                      items: ['Casual', 'Formal', 'Sports', 'Party']
+                      items: ['Casual', 'Formal','Traditional', 'Sporty', 'Party']
                           .map(
                             (e) => DropdownMenuItem(value: e, child: Text(e)),
                           )

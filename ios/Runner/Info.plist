@@ -24,6 +24,11 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+
+	<!-- 📍 NEW: Required by geolocator to ask for location permissions -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Your location is used to fetch local weather data and provide relevant outfit and scheduling recommendations.</string>
+	
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
